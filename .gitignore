@@ -1,0 +1,29 @@
+# ── Secrets — NUNCA commitar ──
+.env
+.env.local
+.env.*.local
+
+# ── Node ──
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Editor ──
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ── Runtime ──
+*.log
+pids/
+*.pid
+*.seed

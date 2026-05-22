@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark" data-lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FluentAI — Your English Journey</title>
+  <link rel="icon" href="/logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/animations.css" />
+</head>
+<body>
+
+<!-- Ambient Background -->
+<div class="ambient-bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <canvas id="particles-canvas"></canvas>
+</div>
+
+<!-- Cursor Glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ======= ONBOARDING SCREEN ======= -->
+<div id="onboarding" class="onboarding-screen">
+  <div class="onboarding-content">
+    <div class="logo-hero">
+      <img src="/logo.png" alt="FluentAI" class="logo-hero-img">
+    </div>
+    <p class="onboarding-tagline" data-i18n="onboarding.tagline">Your personal English learning platform powered by AI</p>
+
+    <div class="onboarding-steps" id="onboardingSteps">
+      <!-- Step 1: Name -->
+      <div class="onboard-step active" id="step1">
+        <h2 data-i18n="onboarding.step1.title">What's your name?</h2>
+        <input type="text" id="inputName" class="glass-input" placeholder="Lucas" maxlength="30" />
+        <button class="btn-primary" onclick="App.onboardNext(1)" data-i18n="onboarding.next">Continue →</button>
+      </div>
+
+      <!-- Step 2: Level -->
+      <div class="onboard-step" id="step2">
+        <h2 data-i18n="onboarding.step2.title">What's your current English level?</h2>
+        <div class="level-grid">
+          <div class="level-card" data-level="A1" onclick="App.selectLevel(this)">
+            <span class="level-badge">A1</span>
+            <strong data-i18n="levels.a1.name">Beginner</strong>
+            <p data-i18n="levels.a1.desc">I know almost nothing</p>
+          </div>
+          <div class="level-card" data-level="A2" onclick="App.selectLevel(this)">
+            <span class="level-badge">A2</span>
+            <strong data-i18n="levels.a2.name">Elementary</strong>
+            <p data-i18n="levels.a2.desc">I know basic words</p>
+          </div>
+          <div class="level-card" data-level="B1" onclick="App.selectLevel(this)">
+            <span class="level-badge">B1</span>
+            <strong data-i18n="levels.b1.name">Intermediate</strong>
+            <p data-i18n="levels.b1.desc">I can have simple conversations</p>
+          </div>
+          <div class="level-card" data-level="B2" onclick="App.selectLevel(this)">
+            <span class="level-badge">B2</span>
+            <strong data-i18n="levels.b2.name">Upper-Intermediate</strong>
+            <p data-i18n="levels.b2.desc">I understand most things</p>
+          </div>
+          <div class="level-card" data-level="C1" onclick="App.selectLevel(this)">
+            <span class="level-badge">C1</span>
+            <strong data-i18n="levels.c1.name">Advanced</strong>
+            <p data-i18n="levels.c1.desc">I'm almost fluent</p>
+          </div>
+          <div class="level-card" data-level="C2" onclick="App.selectLevel(this)">
+            <span class="level-badge">C2</span>
+            <strong data-i18n="levels.c2.name">Mastery</strong>
+            <p data-i18n="levels.c2.desc">Near native level</p>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="App.onboardNext(2)" data-i18n="onboarding.next">Continue →</button>
+      </div>
+
+      <!-- Step 3: Goal -->
+      <div class="onboard-step" id="step3">
+        <h2 data-i18n="onboarding.step3.title">What's your main goal?</h2>
+        <div class="goal-grid">
+          <div class="goal-card" data-goal="work" onclick="App.selectGoal(this)">
+            <i class="fa-solid fa-briefcase"></i>
+            <span data-i18n="goals.work">Work / Career</span>
+          </div>
+          <div class="goal-card" data-goal="travel" onclick="App.selectGoal(this)">
+            <i class="fa-solid fa-plane"></i>
+            <span data-i18n="goals.travel">Travel</span>
+          </div>
+          <div class="goal-card" data-goal="tech" onclick="App.selectGoal(this)">
+            <i class="fa-solid fa-code"></i>
+            <span data-i18n="goals.tech">Tech / Programming</span>
+          </div>
+          <div class="goal-card" data-goal="fluency" onclick="App.selectGoal(this)">
+            <i class="fa-solid fa-comment-dots"></i>
+            <span data-i18n="goals.fluency">Full Fluency</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="App.onboardNext(3)" data-i18n="onboarding.start">Start Learning!</button>
+      </div>
+    </div>
+
+    <div class="lang-toggle-onboard">
+      <button onclick="I18n.toggle()" class="lang-pill">
+        <i class="fa-solid fa-globe"></i>
+        <span id="langToggleLabel">PT / EN</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= MAIN APP ======= -->
+<div id="mainApp" class="main-app hidden">
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="/logo.png" alt="FluentAI" class="logo-icon-sm-img">
+      <span class="sidebar-brand">FluentAI</span>
+    </div>
+
+    <div class="nav-items">
+      <a href="#" class="nav-item active" data-page="dashboard" onclick="App.navigate('dashboard', this)">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span data-i18n="nav.dashboard">Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-page="lessons" onclick="App.navigate('lessons', this)">
+        <i class="fa-solid fa-book-open"></i>
+        <span data-i18n="nav.lessons">Lessons</span>
+      </a>
+      <a href="#" class="nav-item" data-page="exercises" onclick="App.navigate('exercises', this)">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span data-i18n="nav.exercises">Exercises</span>
+      </a>
+      <a href="#" class="nav-item" data-page="vocabulary" onclick="App.navigate('vocabulary', this)">
+        <i class="fa-solid fa-layer-group"></i>
+        <span data-i18n="nav.vocabulary">Vocabulary</span>
+      </a>
+      <a href="#" class="nav-item" data-page="chat" onclick="App.navigate('chat', this)">
+        <i class="fa-solid fa-robot"></i>
+        <span data-i18n="nav.chat">AI Tutor</span>
+        <span class="nav-badge" data-i18n="nav.chat.badge">NEW</span>
+      </a>
+      <a href="#" class="nav-item" data-page="speaking" onclick="App.navigate('speaking', this)">
+        <i class="fa-solid fa-microphone"></i>
+        <span data-i18n="nav.speaking">Speaking</span>
+      </a>
+      <a href="#" class="nav-item" data-page="news" onclick="App.navigate('news', this)">
+        <i class="fa-solid fa-newspaper"></i>
+        <span data-i18n="nav.news">Daily News</span>
+      </a>
+      <a href="#" class="nav-item" data-page="it-english" onclick="App.navigate('it-english', this)">
+        <i class="fa-solid fa-terminal"></i>
+        <span data-i18n="nav.itEnglish">IT English</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-mini">
+        <div class="avatar-mini" id="sidebarAvatar">L</div>
+        <div class="user-mini-info">
+          <span id="sidebarName">Lucas</span>
+          <span class="level-tag" id="sidebarLevel">A2</span>
+        </div>
+      </div>
+      <a href="#" class="nav-item" data-page="settings" onclick="App.navigate('settings', this)">
+        <i class="fa-solid fa-gear"></i>
+        <span data-i18n="nav.settings">Settings</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Mobile Header -->
+  <header class="mobile-header">
+    <button class="hamburger" id="hamburger" onclick="App.toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mobile-logo"><img src="/logo.png" alt="FluentAI" class="mobile-logo-img">FluentAI</div>
+    <button class="theme-btn-mobile" onclick="App.toggleTheme()">
+      <i class="fa-solid fa-circle-half-stroke"></i>
+    </button>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="content-area" id="contentArea">
+
+    <!-- ===== DASHBOARD PAGE ===== -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title text-gradient-animate" id="dashGreeting">Good morning, Lucas! 👋</h1>
+          <p class="page-subtitle" data-i18n="dashboard.subtitle">Let's continue your English journey today.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-icon" onclick="App.toggleTheme()" title="Toggle theme">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+          </button>
+          <button class="btn-lang" onclick="I18n.toggle()">
+            <i class="fa-solid fa-globe"></i>
+            <span id="langLabel">PT</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card glass-card animate-in">
+          <div class="stat-icon" style="--color: #00D4FF">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statStreak">0</span>
+            <span class="stat-label" data-i18n="stats.streak">Day Streak</span>
+          </div>
+        </div>
+        <div class="stat-card glass-card animate-in" style="--delay: 0.1s">
+          <div class="stat-icon" style="--color: #A855F7">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statXP">0</span>
+            <span class="stat-label" data-i18n="stats.xp">Total XP</span>
+          </div>
+        </div>
+        <div class="stat-card glass-card animate-in" style="--delay: 0.2s">
+          <div class="stat-icon" style="--color: #10B981">
+            <i class="fa-solid fa-book"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statLessons">0</span>
+            <span class="stat-label" data-i18n="stats.lessons">Lessons Done</span>
+          </div>
+        </div>
+        <div class="stat-card glass-card animate-in" style="--delay: 0.3s">
+          <div class="stat-icon" style="--color: #F59E0B">
+            <i class="fa-solid fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statAccuracy">-</span>
+            <span class="stat-label" data-i18n="stats.accuracy">Accuracy</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level Progress -->
+      <div class="glass-card level-progress-card animate-in">
+        <div class="level-header">
+          <div>
+            <h3 data-i18n="dashboard.yourLevel">Your Level</h3>
+            <div class="level-display">
+              <span class="current-level-badge" id="currentLevelBadge">A2</span>
+              <div class="level-info">
+                <span class="level-name" id="currentLevelName">Elementary</span>
+                <span class="xp-display"><span id="currentXP">0</span> / <span id="nextLevelXP">500</span> XP</span>
+              </div>
+            </div>
+          </div>
+          <div class="next-level">
+            <span data-i18n="dashboard.nextLevel">Next:</span>
+            <span class="next-level-badge" id="nextLevelBadge">B1</span>
+          </div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="levelProgressBar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Daily Challenge -->
+      <div class="glass-card daily-challenge-card animate-in">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-bolt" style="color: #F59E0B"></i> <span data-i18n="dashboard.dailyChallenge">Daily Challenge</span></h3>
+          <span class="challenge-xp">+50 XP</span>
+        </div>
+        <div id="dailyChallengeContent" class="challenge-content">
+          <div class="loading-challenge">
+            <div class="spinner"></div>
+            <p data-i18n="loading.challenge">Loading today's challenge...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Access -->
+      <div class="quick-access-grid">
+        <div class="quick-card glass-card animate-in" onclick="App.navigate('chat')">
+          <div class="quick-icon"><i class="fa-solid fa-robot"></i></div>
+          <h4 data-i18n="quick.chat">Talk to AI Tutor</h4>
+          <p data-i18n="quick.chat.desc">Practice conversation with Alex</p>
+          <div class="quick-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="quick-card glass-card animate-in" style="--delay: 0.1s" onclick="App.navigate('lessons')">
+          <div class="quick-icon"><i class="fa-solid fa-book-open"></i></div>
+          <h4 data-i18n="quick.lessons">Continue Lesson</h4>
+          <p id="quickLessonDesc" data-i18n="quick.lessons.desc">Grammar & vocabulary</p>
+          <div class="quick-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="quick-card glass-card animate-in" style="--delay: 0.2s" onclick="App.navigate('vocabulary')">
+          <div class="quick-icon"><i class="fa-solid fa-layer-group"></i></div>
+          <h4 data-i18n="quick.flashcards">Flashcards</h4>
+          <p data-i18n="quick.flashcards.desc">Review vocabulary</p>
+          <div class="quick-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+        <div class="quick-card glass-card animate-in" style="--delay: 0.3s" onclick="App.navigate('it-english')">
+          <div class="quick-icon"><i class="fa-solid fa-terminal"></i></div>
+          <h4 data-i18n="quick.itEnglish">IT English</h4>
+          <p data-i18n="quick.itEnglish.desc">Programming & tech vocab</p>
+          <div class="quick-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+      </div>
+
+      <!-- Word of the Day -->
+      <div class="glass-card word-of-day animate-in">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-lightbulb" style="color: #A855F7"></i> <span data-i18n="dashboard.wordOfDay">Word of the Day</span></h3>
+          <button class="btn-refresh" onclick="Progress.newWordOfDay()"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+        <div id="wordOfDayContent"></div>
+      </div>
+    </section>
+
+    <!-- ===== LESSONS PAGE ===== -->
+    <section class="page" id="page-lessons">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title" data-i18n="lessons.title">Lessons</h1>
+          <p class="page-subtitle" data-i18n="lessons.subtitle">Complete grammar from A1 to C2</p>
+        </div>
+        <div class="lesson-level-filter" id="lessonLevelFilter"></div>
+      </div>
+      <div id="lessonsContent"></div>
+    </section>
+
+    <!-- ===== LESSON VIEWER (nested) ===== -->
+    <section class="page" id="page-lesson-viewer">
+      <div class="page-header">
+        <button class="btn-back" onclick="App.navigate('lessons')">
+          <i class="fa-solid fa-arrow-left"></i> <span data-i18n="back">Back</span>
+        </button>
+      </div>
+      <div id="lessonViewerContent"></div>
+    </section>
+
+    <!-- ===== EXERCISES PAGE ===== -->
+    <section class="page" id="page-exercises">
+      <div class="page-header">
+        <h1 class="page-title" data-i18n="exercises.title">Exercises</h1>
+        <p class="page-subtitle" data-i18n="exercises.subtitle">Practice makes perfect!</p>
+      </div>
+      <div id="exercisesContent"></div>
+    </section>
+
+    <!-- ===== VOCABULARY PAGE ===== -->
+    <section class="page" id="page-vocabulary">
+      <div class="page-header">
+        <h1 class="page-title" data-i18n="vocabulary.title">Vocabulary Builder</h1>
+        <p class="page-subtitle" data-i18n="vocabulary.subtitle">Flashcards with spaced repetition</p>
+      </div>
+      <div id="vocabularyContent"></div>
+    </section>
+
+    <!-- ===== AI TUTOR CHAT PAGE ===== -->
+    <section class="page" id="page-chat">
+      <div class="chat-layout">
+        <div class="chat-sidebar-panel">
+          <h3 data-i18n="chat.modes">Chat Modes</h3>
+          <div class="chat-modes">
+            <button class="chat-mode-btn active" data-mode="tutor" onclick="Chat.setMode('tutor', this)">
+              <i class="fa-solid fa-chalkboard-user"></i>
+              <div>
+                <strong data-i18n="chat.mode.tutor">AI Tutor</strong>
+                <small data-i18n="chat.mode.tutor.desc">Learn with Alex</small>
+              </div>
+            </button>
+            <button class="chat-mode-btn" data-mode="conversation" onclick="Chat.setMode('conversation', this)">
+              <i class="fa-solid fa-comments"></i>
+              <div>
+                <strong data-i18n="chat.mode.conversation">Free Conversation</strong>
+                <small data-i18n="chat.mode.conversation.desc">Chat naturally</small>
+              </div>
+            </button>
+            <button class="chat-mode-btn" data-mode="interview" onclick="Chat.setMode('interview', this)">
+              <i class="fa-solid fa-user-tie"></i>
+              <div>
+                <strong data-i18n="chat.mode.interview">Job Interview</strong>
+                <small data-i18n="chat.mode.interview.desc">Tech interview prep</small>
+              </div>
+            </button>
+            <button class="chat-mode-btn" data-mode="correction" onclick="Chat.setMode('correction', this)">
+              <i class="fa-solid fa-spell-check"></i>
+              <div>
+                <strong data-i18n="chat.mode.correction">Text Correction</strong>
+                <small data-i18n="chat.mode.correction.desc">Fix your writing</small>
+              </div>
+            </button>
+          </div>
+
+          <div class="chat-topics">
+            <h4 data-i18n="chat.suggestedTopics">Suggested Topics</h4>
+            <div class="topic-pills" id="chatTopicPills"></div>
+          </div>
+
+          <button class="btn-secondary" onclick="Chat.clearHistory()">
+            <i class="fa-solid fa-trash"></i>
+            <span data-i18n="chat.clear">Clear Chat</span>
+          </button>
+        </div>
+
+        <div class="chat-main-panel">
+          <div class="chat-header-panel">
+            <div class="chat-agent-info">
+              <div class="agent-avatar">
+                <i class="fa-solid fa-robot"></i>
+                <div class="online-dot"></div>
+              </div>
+              <div>
+                <strong id="chatAgentName">Alex</strong>
+                <small data-i18n="chat.agentSubtitle">Native English Tutor • AI</small>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button class="btn-icon" onclick="Chat.toggleTranslation()" title="Toggle translation" id="translationToggleBtn">
+                <i class="fa-solid fa-language"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="messages-area" id="messagesArea">
+            <div class="chat-welcome" id="chatWelcome">
+              <div class="welcome-avatar">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <h3 id="chatWelcomeTitle">Hi! I'm Alex 👋</h3>
+              <p id="chatWelcomeText" data-i18n="chat.welcome">I'm your AI English tutor. How can I help you today?</p>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div class="grammar-check-bar" id="grammarBar" style="display:none">
+              <i class="fa-solid fa-spell-check"></i>
+              <span id="grammarBarText"></span>
+              <button onclick="Chat.dismissGrammar()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="chat-input-row">
+              <button class="btn-icon" onclick="Speech.toggleChatSpeech()" id="chatMicBtn" title="Voice input">
+                <i class="fa-solid fa-microphone"></i>
+              </button>
+              <textarea
+                id="chatInput"
+                class="chat-textarea"
+                placeholder="Type in English... or Portuguese if you need help!"
+                rows="1"
+                onkeydown="Chat.handleKey(event)"
+                oninput="Chat.autoResize(this)"
+              ></textarea>
+              <button class="btn-send" onclick="Chat.send()" id="sendBtn">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+            <div class="chat-helpers">
+              <button class="helper-pill" onclick="Chat.quickSend('Please correct my English')" data-i18n="chat.helper.correct">Correct my English</button>
+              <button class="helper-pill" onclick="Chat.quickSend('Explain this grammar rule to me')" data-i18n="chat.helper.grammar">Grammar help</button>
+              <button class="helper-pill" onclick="Chat.quickSend('Give me a sentence to translate to English')" data-i18n="chat.helper.translate">Translation practice</button>
+              <button class="helper-pill" onclick="Chat.quickSend('What does this word mean?')" data-i18n="chat.helper.meaning">Word meaning</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SPEAKING PRACTICE PAGE ===== -->
+    <section class="page" id="page-speaking">
+      <div class="page-header">
+        <h1 class="page-title" data-i18n="speaking.title">Speaking Practice</h1>
+        <p class="page-subtitle" data-i18n="speaking.subtitle">Train your pronunciation and spoken English</p>
+      </div>
+      <div id="speakingContent"></div>
+    </section>
+
+    <!-- ===== DAILY NEWS PAGE ===== -->
+    <section class="page" id="page-news">
+      <div class="page-header">
+        <h1 class="page-title" data-i18n="news.title">Daily English News</h1>
+        <p class="page-subtitle" data-i18n="news.subtitle">Read real English articles, hover for translations</p>
+      </div>
+      <div id="newsContent"></div>
+    </section>
+
+    <!-- ===== IT ENGLISH PAGE ===== -->
+    <section class="page" id="page-it-english">
+      <div class="page-header">
+        <h1 class="page-title" data-i18n="itEnglish.title">IT English</h1>
+        <p class="page-subtitle" data-i18n="itEnglish.subtitle">Technical vocabulary and professional communication for developers</p>
+      </div>
+      <div id="itEnglishContent"></div>
+    </section>
+
+    <!-- ===== SETTINGS PAGE ===== -->
+    <section class="page" id="page-settings">
+      <div class="page-header">
+        <h1 class="page-title" data-i18n="settings.title">Settings</h1>
+      </div>
+      <div id="settingsContent"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Offline Banner -->
+<div id="offlineBanner" style="
+  display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.4);
+  backdrop-filter:blur(12px);border-radius:12px;padding:10px 20px;
+  color:var(--accent-pink);font-size:13px;font-weight:600;
+  z-index:9998;display:none;align-items:center;gap:8px;white-space:nowrap
+">
+  <i class="fa-solid fa-server"></i>
+  <span id="offlineBannerText">Servidor offline — funcionalidades de IA indisponíveis</span>
+</div>
+
+<!-- XP Popup -->
+<div class="xp-popup" id="xpPopup">+<span id="xpAmount">50</span> XP!</div>
+
+<!-- Level Up Overlay -->
+<div class="level-up-overlay" id="levelUpOverlay" style="display:none">
+  <div class="level-up-content">
+    <div class="level-up-stars">
+      <i class="fa-solid fa-star"></i>
+      <i class="fa-solid fa-star"></i>
+      <i class="fa-solid fa-star"></i>
+    </div>
+    <h2 data-i18n="levelup.title">Level Up!</h2>
+    <div class="new-level-badge" id="newLevelBadge">B1</div>
+    <p id="levelUpMessage" data-i18n="levelup.message">Congratulations! You've reached a new level!</p>
+    <button class="btn-primary" onclick="document.getElementById('levelUpOverlay').style.display='none'; App.navigate('dashboard')">
+      <span data-i18n="levelup.continue">Continue Learning</span> 🚀
+    </button>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script src="/data/translations.js"></script>
+<script src="/data/curriculum.js"></script>
+<script src="/data/phrases.js"></script>
+<script src="/data/it-english.js"></script>
+
+<script src="/js/i18n.js"></script>
+<script src="/js/progress.js"></script>
+<script src="/js/particles.js"></script>
+<script src="/js/speech.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/lessons.js"></script>
+<script src="/js/exercises.js"></script>
+<script src="/js/vocabulary.js"></script>
+<script src="/js/news.js"></script>
+<script src="/js/effects.js"></script>
+<script src="/js/dashboard.js"></script>
+<script src="/js/it-english.js"></script>
+<script src="/js/settings.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
