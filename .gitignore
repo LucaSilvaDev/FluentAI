@@ -1,5 +1,8 @@
 # ── Secrets — NUNCA commitar ──
 .env
+
+# ── Claude Code (configurações locais do desenvolvedor) ──
+.claude/
 .env.local
 .env.*.local
 
